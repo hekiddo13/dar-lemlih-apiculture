@@ -1,0 +1,51 @@
+{
+  "common": {
+    "welcome": "Welcome to Dar Lemlih Apiculture",
+    "search": "Search",
+    "cart": "Cart",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "account": "My Account",
+    "language": "Language",
+    "currency": "MAD",
+    "addToCart": "Add to Cart",
+    "viewCart": "View Cart",
+    "checkout": "Checkout",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "continueShopping": "Continue Shopping"
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "products": {
+    "honey": "Honeys",
+    "pollen": "Pollen",
+    "hiveProducts": "Hive Products",
+    "featured": "Featured Products",
+    "allProducts": "All Products",
+    "price": "Price",
+    "weight": "Weight",
+    "origin": "Origin",
+    "ingredients": "Ingredients",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "halal": "Halal"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "phone": "Phone",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "createAccount": "Create Account",
+    "alreadyHaveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?"
+  }
+}

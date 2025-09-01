@@ -1,0 +1,109 @@
+version: "3.9"
+
+services:
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: darlemlih-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: darlemlih
+      MYSQL_USER: dar
+      MYSQL_PASSWORD: lemlih
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - darlemlih-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  # Spring Boot API
+  api:
+    build:
+      context: ../../apps/api
+      dockerfile: ../../infra/docker/Dockerfile.api
+    container_name: darlemlih-api
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:mysql://db:3306/darlemlih?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_USER: dar
+      DB_PASSWORD: lemlih
+      JWT_SECRET: change_me_super_secret_key_for_production_use_min_256_bits
+      JWT_ACCESS_TTL_MIN: 15
+      JWT_REFRESH_TTL_DAYS: 7
+      PAYMENT_PROVIDER: mock
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      APP_BASE_URL: http://localhost:8080
+      WEB_BASE_URL: http://localhost:5173
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - darlemlih-network
+    volumes:
+      - ./uploads:/app/uploads
+
+  # React Frontend
+  web:
+    build:
+      context: ../../apps/web
+      dockerfile: ../../infra/docker/Dockerfile.web
+    container_name: darlemlih-web
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:8080
+      VITE_APP_DEFAULT_LANG: fr
+      VITE_APP_SUPPORTED_LANGS: fr,en,ar
+      VITE_PAYMENT_PROVIDER: mock
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    networks:
+      - darlemlih-network
+
+  # MailHog for Email Testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: darlemlih-mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - darlemlih-network
+
+  # phpMyAdmin for Database Management
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: darlemlih-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_USER: dar
+      PMA_PASSWORD: lemlih
+      UPLOAD_LIMIT: 50M
+    ports:
+      - "8090:80"
+    depends_on:
+      - db
+    networks:
+      - darlemlih-network
+
+networks:
+  darlemlih-network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local
