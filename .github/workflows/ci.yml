@@ -8,7 +8,12 @@ on:
 
 jobs:
   backend-test:
+    name: API (Spring Boot)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: apps/api
     
     services:
       mysql:
@@ -21,74 +26,89 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
+    - name: Set up Temurin JDK 21
+      uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '21'
         distribution: 'temurin'
+        cache: maven
     
-    - name: Cache Maven packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
+    # Install Maven explicitly to avoid "exit code 127"
+    - name: Install Maven
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y maven
+        mvn -v
     
     - name: Run backend tests
-      working-directory: ./apps/api
-      run: |
-        ./mvnw clean test
+      run: mvn -B -ntp -DskipTests=false test
       env:
         SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/darlemlih_test
         SPRING_DATASOURCE_USERNAME: root
         SPRING_DATASOURCE_PASSWORD: rootpass
+    
+    - name: Build JAR
+      run: mvn -B -ntp -DskipTests package
 
   frontend-test:
+    name: Web (React + Vite)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: apps/web
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
+    - name: Use Node 20
+      uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
         cache: 'npm'
         cache-dependency-path: apps/web/package-lock.json
     
     - name: Install dependencies
-      working-directory: ./apps/web
-      run: npm ci
+      run: npm ci || npm install
     
     - name: Run linter
-      working-directory: ./apps/web
       run: npm run lint || true
     
-    - name: Build frontend
-      working-directory: ./apps/web
-      run: npm run build
+    - name: Run tests (if present)
+      run: npm run test --if-present -- --run || true
     
-    - name: Run tests
-      working-directory: ./apps/web
-      run: npm test || true
+    - name: Build frontend
+      run: npm run build
 
   docker-build:
+    name: Docker Images
     runs-on: ubuntu-latest
     needs: [backend-test, frontend-test]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: ${{ success() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
     
     - name: Build API Docker image
-      run: |
-        docker build -f infra/docker/Dockerfile.api -t dar-lemlih-api:latest apps/api
+      run: docker build -t darlemlih/api:latest -f infra/docker/Dockerfile.api apps/api
     
     - name: Build Web Docker image
+      run: docker build -t darlemlih/web:latest -f infra/docker/Dockerfile.web apps/web
+    
+    # Optional: Push to Docker Hub if secrets are configured
+    - name: Login to Docker Hub
+      if: ${{ secrets.DOCKERHUB_USER && secrets.DOCKERHUB_TOKEN }}
+      run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
+    
+    - name: Tag & Push Images
+      if: ${{ secrets.DOCKERHUB_USER && secrets.DOCKERHUB_TOKEN }}
       run: |
-        docker build -f infra/docker/Dockerfile.web -t dar-lemlih-web:latest apps/web
+        docker tag darlemlih/api:latest ${{ secrets.DOCKERHUB_USER }}/darlemlih-api:latest
+        docker tag darlemlih/web:latest ${{ secrets.DOCKERHUB_USER }}/darlemlih-web:latest
+        docker push ${{ secrets.DOCKERHUB_USER }}/darlemlih-api:latest
+        docker push ${{ secrets.DOCKERHUB_USER }}/darlemlih-web:latest
