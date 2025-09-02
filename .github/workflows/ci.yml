@@ -10,10 +10,6 @@ jobs:
   backend-test:
     name: API (Spring Boot)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: apps/api
     
     services:
       mysql:
@@ -33,24 +29,25 @@ jobs:
       with:
         java-version: '21'
         distribution: 'temurin'
-        cache: maven
     
-    # Install Maven explicitly to avoid "exit code 127"
-    - name: Install Maven
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y maven
-        mvn -v
+    - name: Cache Maven packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
     
     - name: Run backend tests
-      run: mvn -B -ntp -DskipTests=false test
+      working-directory: ./apps/api
+      run: ./mvnw clean test -B
       env:
         SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/darlemlih_test
         SPRING_DATASOURCE_USERNAME: root
         SPRING_DATASOURCE_PASSWORD: rootpass
     
     - name: Build JAR
-      run: mvn -B -ntp -DskipTests package
+      working-directory: ./apps/api
+      run: ./mvnw package -B -DskipTests
 
   frontend-test:
     name: Web (React + Vite)

@@ -9,7 +9,7 @@ import {
   TrendingDown,
   Calendar
 } from 'lucide-react';
-import api from '../../lib/api';
+import { api } from '../../lib/api';
 import { format } from 'date-fns';
 
 export default function DashboardPage() {

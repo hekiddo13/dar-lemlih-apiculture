@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { useAuthStore } from './store/useAuthStore';
+import { useAuthStore } from "../stores/authStore"
 
 // Layout
 import Navbar from './components/layout/Navbar';

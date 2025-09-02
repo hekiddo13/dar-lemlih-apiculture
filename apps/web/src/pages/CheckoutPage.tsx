@@ -4,9 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { CreditCard, Truck, Check } from 'lucide-react';
-import { useCartStore } from '../store/useCartStore';
-import api from '../lib/api';
+import { CreditCard, Truck } from 'lucide-react';
+import { useCartStore } from "../stores/cartStore";
 import toast from 'react-hot-toast';
 import CheckoutSteps from '../components/checkout/CheckoutSteps';
 
@@ -30,7 +29,7 @@ type CheckoutForm = z.infer<typeof checkoutSchema>;
 export default function CheckoutPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { cart, clearCart } = useCartStore();
+  const { items, clearCart, getTotalPrice } = useCartStore();
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -48,20 +47,24 @@ export default function CheckoutPage() {
     },
   });
 
+  if (items.length === 0) {
+    navigate('/cart');
+    return null;
+  }
+
+  const subtotal = getTotalPrice();
+  const shippingCost = items.length > 0 ? 20 : 0;
+  const total = subtotal + shippingCost;
+  const currency = 'MAD';
+
   const onSubmit = async (data: CheckoutForm) => {
     try {
       setLoading(true);
-      const response = await api.post('/api/orders/checkout', data);
-      
-      if (response.data.paymentUrl) {
-        // Redirect to payment page
-        window.location.href = response.data.paymentUrl;
-      } else {
-        // Order created successfully
-        await clearCart();
-        toast.success(t('checkout.orderSuccess'));
-        navigate(`/orders/${response.data.orderNumber}`);
-      }
+      // Simulate order placement for MVP
+      await new Promise((r) => setTimeout(r, 800));
+      clearCart();
+      toast.success(t('checkout.orderSuccess'));
+      navigate('/');
     } catch (error) {
       console.error('Checkout failed:', error);
       toast.error(t('checkout.orderFailed'));
@@ -69,11 +72,6 @@ export default function CheckoutPage() {
       setLoading(false);
     }
   };
-
-  if (!cart || cart.items.length === 0) {
-    navigate('/cart');
-    return null;
-  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -244,10 +242,10 @@ export default function CheckoutPage() {
             <h2 className="text-xl font-semibold mb-4">{t('checkout.orderSummary')}</h2>
             
             <div className="space-y-3 mb-4">
-              {cart.items.map((item) => (
+              {items.map((item) => (
                 <div key={item.id} className="flex justify-between text-sm">
                   <span>{item.productName} x{item.quantity}</span>
-                  <span>{item.totalPrice} {cart.currency}</span>
+                  <span>{item.totalPrice} {currency}</span>
                 </div>
               ))}
             </div>
@@ -257,16 +255,16 @@ export default function CheckoutPage() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>{t('common.subtotal')}</span>
-                <span>{cart.subtotal} {cart.currency}</span>
+                <span>{subtotal} {currency}</span>
               </div>
               <div className="flex justify-between">
                 <span>{t('common.shipping')}</span>
-                <span>{cart.shippingCost} {cart.currency}</span>
+                <span>{shippingCost} {currency}</span>
               </div>
               <hr className="my-2" />
               <div className="flex justify-between font-bold text-lg">
                 <span>{t('common.total')}</span>
-                <span className="text-honey">{cart.total} {cart.currency}</span>
+                <span className="text-honey">{total} {currency}</span>
               </div>
             </div>
 

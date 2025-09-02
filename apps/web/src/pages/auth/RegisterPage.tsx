@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Eye, EyeOff } from 'lucide-react';
-import api from '../../lib/api';
+import { api } from '../../lib/api';
 import toast from 'react-hot-toast';
 
 const registerSchema = z.object({

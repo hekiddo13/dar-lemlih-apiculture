@@ -1,55 +1,19 @@
-import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
-import { useCartStore } from '../store/useCartStore';
-import { useAuthStore } from '../store/useAuthStore';
+import { useCartStore } from "../stores/cartStore";
 
 export default function CartPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { cart, fetchCart, updateQuantity, removeFromCart, loading } = useCartStore();
-  const { isAuthenticated } = useAuthStore();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchCart();
-    }
-  }, [isAuthenticated]);
+  const { items, updateQuantity, removeItem, getTotalPrice } = useCartStore();
 
   const handleCheckout = () => {
-    if (!isAuthenticated) {
-      navigate('/login?redirect=/checkout');
-    } else {
-      navigate('/checkout');
-    }
+    if (items.length === 0) return;
+    navigate('/checkout');
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <ShoppingBag size={64} className="mx-auto mb-4 text-gray-400" />
-        <h2 className="text-2xl font-bold mb-4">{t('cart.loginRequired')}</h2>
-        <Link to="/login" className="btn btn-primary">
-          {t('common.login')}
-        </Link>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-gray-200 h-32 rounded-lg" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!cart || cart.items.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <ShoppingBag size={64} className="mx-auto mb-4 text-gray-400" />
@@ -61,6 +25,11 @@ export default function CartPage() {
     );
   }
 
+  const subtotal = getTotalPrice();
+  const shippingCost = items.length > 0 ? 20 : 0; // Flat demo shipping
+  const total = subtotal + shippingCost;
+  const currency = 'MAD';
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">{t('common.cart')}</h1>
@@ -68,7 +37,7 @@ export default function CartPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <div className="space-y-4">
-            {cart.items.map((item) => (
+            {items.map((item) => (
               <div key={item.id} className="bg-white rounded-lg shadow p-4 flex gap-4">
                 <img
                   src={item.productImage || '/placeholder.jpg'}
@@ -103,10 +72,10 @@ export default function CartPage() {
                     
                     <div className="flex items-center gap-4">
                       <span className="font-semibold">
-                        {item.totalPrice} {cart.currency}
+                        {item.totalPrice} {currency}
                       </span>
                       <button
-                        onClick={() => removeFromCart(item.productId)}
+                        onClick={() => removeItem(item.productId)}
                         className="text-red-500 hover:text-red-700"
                       >
                         <Trash2 size={20} />
@@ -127,16 +96,16 @@ export default function CartPage() {
             <div className="space-y-2 mb-4">
               <div className="flex justify-between">
                 <span>{t('common.subtotal')}</span>
-                <span>{cart.subtotal} {cart.currency}</span>
+                <span>{subtotal} {currency}</span>
               </div>
               <div className="flex justify-between">
                 <span>{t('common.shipping')}</span>
-                <span>{cart.shippingCost} {cart.currency}</span>
+                <span>{shippingCost} {currency}</span>
               </div>
               <hr />
               <div className="flex justify-between font-bold text-lg">
                 <span>{t('common.total')}</span>
-                <span className="text-honey">{cart.total} {cart.currency}</span>
+                <span className="text-honey">{total} {currency}</span>
               </div>
             </div>
 
