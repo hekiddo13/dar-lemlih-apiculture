@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Heart, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
-import api from '../lib/api';
+import { ShoppingCart, ChevronLeft, ChevronRight, Package, MapPin, Leaf } from 'lucide-react';
+import { api } from '../lib/api';
 import { Product } from '../types';
-import { useCartStore } from '../store/useCartStore';
-import { useAuthStore } from '../store/useAuthStore';
-import toast from 'react-hot-toast';
+import { useCartStore } from '../stores/cartStore';
+import { useAuthStore } from '../stores/authStore';
+import { formatPrice, getLocalizedField } from '../lib/utils';
+import Button from '../components/ui/Button';
+import Loader from '../components/ui/Loader';
+import Error from '../components/ui/Error';
 
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { addToCart } = useCartStore();
+  const addItem = useCartStore(state => state.addItem);
   const { isAuthenticated } = useAuthStore();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -26,25 +29,20 @@ export default function ProductDetailPage() {
   const fetchProduct = async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/api/products/${slug}`);
-      setProduct(response.data);
+      const response = await api<Product>(`/api/products/${slug}`, { auth: false });
+      setProduct(response);
     } catch (error) {
       console.error('Failed to fetch product:', error);
-      toast.error(t('errors.productNotFound'));
       navigate('/products');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddToCart = async () => {
-    if (!isAuthenticated) {
-      toast.error(t('auth.loginRequired'));
-      navigate('/login');
-      return;
-    }
+  const handleAddToCart = () => {
     if (product) {
-      await addToCart(product.id, quantity);
+      addItem(product, quantity);
+      // You could add a toast notification here
     }
   };
 

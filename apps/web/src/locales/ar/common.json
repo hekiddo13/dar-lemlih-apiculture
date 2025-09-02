@@ -1,0 +1,49 @@
+{
+  "common": {
+    "welcome": "مرحبا بكم في دار لمليح",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "addToCart": "إضافة إلى السلة",
+    "viewDetails": "عرض التفاصيل",
+    "currency": "د.م."
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "products": "المنتجات",
+    "cart": "السلة",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "logout": "تسجيل الخروج",
+    "admin": "الإدارة",
+    "orders": "طلباتي"
+  },
+  "products": {
+    "featured": "المنتجات المميزة",
+    "allProducts": "جميع المنتجات",
+    "noProducts": "لم يتم العثور على منتجات",
+    "inStock": "متوفر",
+    "outOfStock": "نفد المخزون"
+  },
+  "cart": {
+    "title": "سلتي",
+    "empty": "سلتك فارغة",
+    "subtotal": "المجموع الفرعي",
+    "shipping": "الشحن",
+    "total": "المجموع",
+    "checkout": "إتمام الطلب",
+    "continueShopping": "متابعة التسوق",
+    "remove": "إزالة"
+  },
+  "auth": {
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "name": "الاسم",
+    "phone": "الهاتف",
+    "loginTitle": "تسجيل الدخول",
+    "registerTitle": "إنشاء حساب",
+    "loginButton": "دخول",
+    "registerButton": "تسجيل",
+    "alreadyHaveAccount": "لديك حساب بالفعل؟",
+    "noAccount": "ليس لديك حساب؟"
+  }
+}

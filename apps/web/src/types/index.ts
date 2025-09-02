@@ -1,24 +1,25 @@
 export interface Product {
   id: string;
+  sku?: string;
   slug: string;
   nameFr: string;
   nameEn: string;
   nameAr: string;
-  descriptionFr: string;
-  descriptionEn: string;
-  descriptionAr: string;
+  descriptionFr?: string;
+  descriptionEn?: string;
+  descriptionAr?: string;
   price: number;
   currency: string;
   images: string[];
   stockQuantity: number;
-  categoryId: string;
+  categoryId?: string;
   categoryName?: string;
-  isHalal: boolean;
+  isHalal?: boolean;
+  isActive?: boolean;
+  isFeatured?: boolean;
   origin?: string;
   ingredients?: string;
   weightGrams?: number;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface Category {
@@ -88,10 +89,5 @@ export interface Address {
   country: string;
 }
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  role: 'USER' | 'ADMIN';
-}
+// User type is now in user.ts
+export { User } from './user';

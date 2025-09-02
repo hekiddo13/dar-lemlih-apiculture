@@ -1,55 +1,58 @@
-import axios from 'axios';
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+export type HttpMethod = 'GET'|'POST'|'PUT'|'PATCH'|'DELETE';
 
-export const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+let accessToken: string | null = localStorage.getItem('token');
 
-// Add auth token to requests if available
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+export function setToken(token: string | null) {
+  accessToken = token;
+  if (token) localStorage.setItem('token', token);
+  else localStorage.removeItem('token');
+}
+
+async function request<T = unknown>(path: string, options: { method?: HttpMethod; body?: any; auth?: boolean } = {}) {
+  const { method = 'GET', body, auth = true } = options;
+  const headers: Record<string,string> = { 'Content-Type':'application/json' };
+  if (auth && accessToken) headers.Authorization = `Bearer ${accessToken}`;
+  const res = await fetch(`${API_URL}${path}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(()=> '');
+    throw new Error(`${res.status} ${res.statusText} - ${text}`);
   }
-  return config;
-});
+  const ct = res.headers.get('content-type') || '';
+  return ct.includes('application/json') ? (await res.json() as T) : (await res.text() as unknown as T);
+}
 
-// Handle token refresh
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      
-      try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        const response = await api.post('/api/auth/refresh', null, {
-          params: { refreshToken }
-        });
-        
-        const { accessToken, refreshToken: newRefreshToken } = response.data;
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', newRefreshToken);
-        
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        return api(originalRequest);
-      } catch (refreshError) {
-        // Refresh failed, redirect to login
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      }
-    }
-    
-    return Promise.reject(error);
+// Named export compatible with function-style usage: api<T>(path, opts)
+const api = Object.assign(
+  request,
+  {
+    // Axios-like helpers returning { data } for compatibility with pages that expect response.data
+    async get<T = unknown>(path: string, opts: { auth?: boolean } = {}) {
+      const data = await request<T>(path, { method: 'GET', auth: opts.auth ?? true });
+      return { data } as { data: T };
+    },
+    async post<T = unknown>(path: string, body?: any, opts: { auth?: boolean } = {}) {
+      const data = await request<T>(path, { method: 'POST', body, auth: opts.auth ?? true });
+      return { data } as { data: T };
+    },
+    async put<T = unknown>(path: string, body?: any, opts: { auth?: boolean } = {}) {
+      const data = await request<T>(path, { method: 'PUT', body, auth: opts.auth ?? true });
+      return { data } as { data: T };
+    },
+    async patch<T = unknown>(path: string, body?: any, opts: { auth?: boolean } = {}) {
+      const data = await request<T>(path, { method: 'PATCH', body, auth: opts.auth ?? true });
+      return { data } as { data: T };
+    },
+    async delete<T = unknown>(path: string, opts: { auth?: boolean } = {}) {
+      const data = await request<T>(path, { method: 'DELETE', auth: opts.auth ?? true });
+      return { data } as { data: T };
+    },
   }
 );
 
-export default api;
+export { api };

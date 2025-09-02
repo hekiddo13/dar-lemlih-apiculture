@@ -1,0 +1,49 @@
+{
+  "common": {
+    "welcome": "Welcome to Dar Lemlih",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "addToCart": "Add to Cart",
+    "viewDetails": "View Details",
+    "currency": "MAD"
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "cart": "Cart",
+    "login": "Login",
+    "register": "Sign Up",
+    "logout": "Logout",
+    "admin": "Admin",
+    "orders": "My Orders"
+  },
+  "products": {
+    "featured": "Featured Products",
+    "allProducts": "All Products",
+    "noProducts": "No products found",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock"
+  },
+  "cart": {
+    "title": "My Cart",
+    "empty": "Your cart is empty",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "total": "Total",
+    "checkout": "Checkout",
+    "continueShopping": "Continue Shopping",
+    "remove": "Remove"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "phone": "Phone",
+    "loginTitle": "Login",
+    "registerTitle": "Create Account",
+    "loginButton": "Sign In",
+    "registerButton": "Sign Up",
+    "alreadyHaveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?"
+  }
+}

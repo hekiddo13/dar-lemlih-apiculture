@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ShoppingCart, Check } from 'lucide-react';
 import { Product } from '../../types';
-import { useCartStore } from '../../store/useCartStore';
-import { useAuthStore } from '../../store/useAuthStore';
+import { useCartStore } from "../stores/cartStore"
+import { useAuthStore } from "../stores/authStore"
 import toast from 'react-hot-toast';
 
 interface ProductCardProps {

@@ -11,8 +11,8 @@ import {
   Package,
   Settings
 } from 'lucide-react';
-import { useAuthStore } from '../../store/useAuthStore';
-import { useCartStore } from '../../store/useCartStore';
+import { useAuthStore } from "../stores/authStore"
+import { useCartStore } from "../stores/cartStore"
 
 export default function Navbar() {
   const { t, i18n } = useTranslation();

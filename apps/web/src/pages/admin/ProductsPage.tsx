@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Edit, Trash2, Search } from 'lucide-react';
-import api from '../../lib/api';
+import { api } from '../../lib/api';
 import { Product } from '../../types';
 import toast from 'react-hot-toast';
 

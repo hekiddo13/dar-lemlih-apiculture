@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ShoppingCart, User, Menu, Globe, X } from 'lucide-react';
 import { useState } from 'react';
-import { useAuthStore } from '../../store/useAuthStore';
-import { useCartStore } from '../../store/useCartStore';
+import { useAuthStore } from "../../stores/authStore"
+import { useCartStore } from "../../stores/cartStore"
 
 export default function Header() {
   const { t, i18n } = useTranslation();

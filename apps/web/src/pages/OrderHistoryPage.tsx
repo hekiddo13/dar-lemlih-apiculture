@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Package, Calendar, CreditCard, ChevronRight } from 'lucide-react';
-import api from '../lib/api';
+import { api } from '../lib/api';
 import { Order } from '../types';
 import { format } from 'date-fns';
 
