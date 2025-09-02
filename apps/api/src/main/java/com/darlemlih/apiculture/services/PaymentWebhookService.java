@@ -87,8 +87,9 @@ public class PaymentWebhookService {
             paymentIntentId = json.path("data").path("object").path("id").asText();
         }
 
-        Order order = orderRepository.findByPaymentIntentId(paymentIntentId)
-                .orElseThrow(() -> new RuntimeException("Order not found for payment intent: " + paymentIntentId));
+        final String finalPaymentIntentId = paymentIntentId;
+        Order order = orderRepository.findByPaymentIntentId(finalPaymentIntentId)
+                .orElseThrow(() -> new RuntimeException("Order not found for payment intent: " + finalPaymentIntentId));
 
         order.setStatus(OrderStatus.PAID);
         orderRepository.save(order);
@@ -100,7 +101,7 @@ public class PaymentWebhookService {
     }
 
     private void handlePaymentFailure(JsonNode json) {
-        String paymentIntentId = json.path("data").path("object").path("id").asText();
+        final String paymentIntentId = json.path("data").path("object").path("id").asText();
         
         Order order = orderRepository.findByPaymentIntentId(paymentIntentId)
                 .orElseThrow(() -> new RuntimeException("Order not found for payment intent: " + paymentIntentId));
