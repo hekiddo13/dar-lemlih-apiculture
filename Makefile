@@ -1,4 +1,4 @@
-.PHONY: help dev build up down restart logs clean seed test
+.PHONY: help dev prod build up down restart logs clean seed test
 
 # Colors for output
 GREEN=\033[0;32m
@@ -17,7 +17,7 @@ help: ## Show this help message
 
 dev: ## Start development environment with Docker Compose
 	@echo '${GREEN}Starting development environment...${NC}'
-	docker-compose -f infra/docker/docker-compose.yml up -d
+	docker-compose -f infra/docker/docker-compose.dev.yml up -d
 	@echo '${GREEN}Development environment started!${NC}'
 	@echo ''
 	@echo 'Services available at:'
@@ -27,37 +27,46 @@ dev: ## Start development environment with Docker Compose
 	@echo '  - phpMyAdmin:  ${YELLOW}http://localhost:8090${NC}'
 	@echo '  - MailHog:     ${YELLOW}http://localhost:8025${NC}'
 
+prod: ## Start production environment with Docker Compose
+	@echo '${GREEN}Starting production environment...${NC}'
+	docker-compose -f infra/docker/docker-compose.yml up -d
+	@echo '${GREEN}Production environment started!${NC}'
+	@echo ''
+	@echo 'Services available at:'
+	@echo '  - Frontend:   ${YELLOW}http://localhost:5173${NC}'
+	@echo '  - Backend API: ${YELLOW}http://localhost:8080${NC}'
+
 build: ## Build Docker images
 	@echo '${GREEN}Building Docker images...${NC}'
-	docker-compose -f infra/docker/docker-compose.yml build
+	docker-compose -f infra/docker/docker-compose.dev.yml build
 
 up: ## Start all services
 	@echo '${GREEN}Starting services...${NC}'
-	docker-compose -f infra/docker/docker-compose.yml up -d
+	docker-compose -f infra/docker/docker-compose.dev.yml up -d
 
 down: ## Stop all services
 	@echo '${YELLOW}Stopping services...${NC}'
-	docker-compose -f infra/docker/docker-compose.yml down
+	docker-compose -f infra/docker/docker-compose.dev.yml down
 
 restart: ## Restart all services
 	@echo '${YELLOW}Restarting services...${NC}'
-	docker-compose -f infra/docker/docker-compose.yml restart
+	docker-compose -f infra/docker/docker-compose.dev.yml restart
 
 logs: ## View logs from all services
-	docker-compose -f infra/docker/docker-compose.yml logs -f
+	docker-compose -f infra/docker/docker-compose.dev.yml logs -f
 
 logs-api: ## View API logs
-	docker-compose -f infra/docker/docker-compose.yml logs -f api
+	docker-compose -f infra/docker/docker-compose.dev.yml logs -f api
 
 logs-web: ## View web logs
-	docker-compose -f infra/docker/docker-compose.yml logs -f web
+	docker-compose -f infra/docker/docker-compose.dev.yml logs -f web-dev
 
 logs-db: ## View database logs
-	docker-compose -f infra/docker/docker-compose.yml logs -f db
+	docker-compose -f infra/docker/docker-compose.dev.yml logs -f db
 
 clean: ## Clean up Docker containers, networks, and volumes
 	@echo '${RED}Cleaning up Docker resources...${NC}'
-	docker-compose -f infra/docker/docker-compose.yml down -v
+	docker-compose -f infra/docker/docker-compose.dev.yml down -v
 	@echo '${GREEN}Cleanup complete!${NC}'
 
 seed: ## Seed the database with demo data

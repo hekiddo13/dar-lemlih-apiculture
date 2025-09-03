@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, X } from 'lucide-react';
 import { api } from '../../lib/api';
 import { Product } from '../../types';
 import toast from 'react-hot-toast';
@@ -12,6 +12,21 @@ export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [form, setForm] = useState<Partial<Product & { sku: string }>>({
+    nameFr: '',
+    nameEn: '',
+    nameAr: '',
+    descriptionFr: '',
+    descriptionEn: '',
+    descriptionAr: '',
+    price: 0,
+    currency: 'MAD',
+    stockQuantity: 0,
+    slug: '',
+    sku: '',
+    isActive: true,
+    isFeatured: false,
+  });
 
   useEffect(() => {
     fetchProducts();
@@ -44,6 +59,7 @@ export default function ProductsPage() {
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
+    setForm({ ...product, sku: product.sku || '' });
     setShowModal(true);
   };
 
@@ -66,6 +82,12 @@ export default function ProductsPage() {
         <button
           onClick={() => {
             setEditingProduct(null);
+            setForm({
+              nameFr: '', nameEn: '', nameAr: '',
+              descriptionFr: '', descriptionEn: '', descriptionAr: '',
+              price: 0, currency: 'MAD', stockQuantity: 0,
+              slug: '', sku: '', isActive: true, isFeatured: false,
+            });
             setShowModal(true);
           }}
           className="btn btn-primary flex items-center gap-2"
@@ -177,6 +199,149 @@ export default function ProductsPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Create/Edit Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <h3 className="text-lg font-semibold">
+                {editingProduct ? t('admin.editProduct') : t('admin.addProduct')}
+              </h3>
+              <button onClick={() => setShowModal(false)} className="p-1 hover:bg-gray-100 rounded">
+                <X size={18} />
+              </button>
+            </div>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                  const payload = {
+                    ...form,
+                  } as any;
+                  if (editingProduct) {
+                    // Optional: implement update later
+                    toast.error(t('admin.updateNotImplemented'));
+                    return;
+                  }
+                  await api.post('/api/admin/products', payload);
+                  toast.success(t('admin.createSuccess'));
+                  setShowModal(false);
+                  fetchProducts();
+                } catch (err) {
+                  toast.error(t('errors.saveFailed'));
+                }
+              }}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
+                <div>
+                  <label className="block text-sm font-medium mb-1">{t('admin.sku')}</label>
+                  <input
+                    value={form.sku || ''}
+                    onChange={(e) => setForm({ ...form, sku: e.target.value })}
+                    className="w-full border rounded px-3 py-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Slug</label>
+                  <input
+                    value={form.slug || ''}
+                    onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                    className="w-full border rounded px-3 py-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">{t('admin.nameFr')}</label>
+                  <input
+                    value={form.nameFr || ''}
+                    onChange={(e) => setForm({ ...form, nameFr: e.target.value })}
+                    className="w-full border rounded px-3 py-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">{t('admin.nameEn')}</label>
+                  <input
+                    value={form.nameEn || ''}
+                    onChange={(e) => setForm({ ...form, nameEn: e.target.value })}
+                    className="w-full border rounded px-3 py-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">{t('admin.nameAr')}</label>
+                  <input
+                    value={form.nameAr || ''}
+                    onChange={(e) => setForm({ ...form, nameAr: e.target.value })}
+                    className="w-full border rounded px-3 py-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">{t('admin.price')}</label>
+                  <input
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    value={form.price ?? 0}
+                    onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
+                    className="w-full border rounded px-3 py-2"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">{t('admin.stock')}</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={form.stockQuantity ?? 0}
+                    onChange={(e) => setForm({ ...form, stockQuantity: Number(e.target.value) })}
+                    className="w-full border rounded px-3 py-2"
+                    required
+                  />
+                </div>
+                <div className="flex items-center gap-4 mt-2">
+                  <label className="inline-flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={!!form.isActive}
+                      onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+                    />
+                    <span>{t('admin.active')}</span>
+                  </label>
+                  <label className="inline-flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={!!form.isFeatured}
+                      onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
+                    />
+                    <span>{t('admin.featured')}</span>
+                  </label>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium mb-1">{t('admin.descriptionFr')}</label>
+                  <textarea
+                    rows={3}
+                    value={form.descriptionFr || ''}
+                    onChange={(e) => setForm({ ...form, descriptionFr: e.target.value })}
+                    className="w-full border rounded px-3 py-2"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 px-6 py-4 border-t">
+                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                  {t('common.cancel')}
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  {editingProduct ? t('common.save') : t('common.create')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

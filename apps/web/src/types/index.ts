@@ -1,5 +1,5 @@
 export interface Product {
-  id: string;
+  id: string | number;
   sku?: string;
   slug: string;
   nameFr: string;
@@ -33,7 +33,7 @@ export interface Category {
 
 export interface CartItem {
   id: string;
-  productId: string;
+  productId: string | number;
   productName: string;
   productSlug: string;
   productImage?: string;

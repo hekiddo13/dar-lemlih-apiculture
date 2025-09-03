@@ -19,13 +19,20 @@ spring:
   mail:
     host: localhost
     port: 1025
+  devtools:
+    livereload:
+      enabled: false
+    restart:
+      enabled: false
 
 server:
-  port: 8080
+  port: 0
+
 
 app:
   base-url: http://localhost:8080
 
 jwt:
-  access-ttl-min: 15
-  refresh-ttl-days: 7
+  secret: change_me_dev_secret_change_in_prod_please_12345678901234567890
+  access-token-expiration: 15
+  refresh-token-expiration: 7

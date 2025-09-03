@@ -7,8 +7,8 @@ interface CartState {
   isOpen: boolean;
   
   addItem: (product: Product, quantity?: number) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  removeItem: (productId: string) => void;
+  updateQuantity: (productId: string | number, quantity: number) => void;
+  removeItem: (productId: string | number) => void;
   clearCart: () => void;
   toggleCart: () => void;
   getTotalPrice: () => number;
@@ -60,7 +60,7 @@ export const useCartStore = create<CartState>()(
         }
       },
 
-      updateQuantity: (productId: string, quantity: number) => {
+      updateQuantity: (productId: string | number, quantity: number) => {
         if (quantity <= 0) {
           get().removeItem(productId);
           return;
@@ -79,7 +79,7 @@ export const useCartStore = create<CartState>()(
         });
       },
 
-      removeItem: (productId: string) => {
+      removeItem: (productId: string | number) => {
         set({
           items: get().items.filter(item => item.productId !== productId),
         });

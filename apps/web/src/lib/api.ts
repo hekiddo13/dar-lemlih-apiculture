@@ -10,15 +10,48 @@ export function setToken(token: string | null) {
   else localStorage.removeItem('token');
 }
 
-async function request<T = unknown>(path: string, options: { method?: HttpMethod; body?: any; auth?: boolean } = {}) {
-  const { method = 'GET', body, auth = true } = options;
+let isRefreshing = false;
+let pending: Array<() => void> = [];
+
+function getRefreshToken() {
+  return localStorage.getItem('refreshToken');
+}
+
+async function tryRefresh() {
+  if (isRefreshing) {
+    await new Promise<void>(resolve => pending.push(resolve));
+    return;
+  }
+  isRefreshing = true;
+  try {
+    const rt = getRefreshToken();
+    if (!rt) throw new Error('No refresh token');
+    const res = await fetch(`${API_URL}/api/auth/refresh?refreshToken=${encodeURIComponent(rt)}`, { method: 'POST' });
+    if (!res.ok) throw new Error('Refresh failed');
+    const data = await res.json();
+    setToken(data.accessToken);
+    if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+  } finally {
+    isRefreshing = false;
+    pending.forEach(fn => fn());
+    pending = [];
+  }
+}
+
+async function request<T = unknown>(path: string, options: { method?: HttpMethod; body?: any; auth?: boolean; retried?: boolean } = {}) {
+  const { method = 'GET', body, auth = true, retried = false } = options;
   const headers: Record<string,string> = { 'Content-Type':'application/json' };
   if (auth && accessToken) headers.Authorization = `Bearer ${accessToken}`;
-  const res = await fetch(`${API_URL}${path}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  const res = await fetch(`${API_URL}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  if (res.status === 401 && auth && !retried) {
+    try {
+      await tryRefresh();
+      return request<T>(path, { method, body, auth, retried: true });
+    } catch (e) {
+      setToken(null);
+      localStorage.removeItem('refreshToken');
+    }
+  }
   if (!res.ok) {
     const text = await res.text().catch(()=> '');
     throw new Error(`${res.status} ${res.statusText} - ${text}`);

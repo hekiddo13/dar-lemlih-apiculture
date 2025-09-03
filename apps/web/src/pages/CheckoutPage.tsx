@@ -60,9 +60,27 @@ export default function CheckoutPage() {
   const onSubmit = async (data: CheckoutForm) => {
     try {
       setLoading(true);
-      // Simulate order placement for MVP
-      await new Promise((r) => setTimeout(r, 800));
+      const payload = {
+        shippingAddress: data.shippingAddress,
+        notes: data.notes,
+        paymentMethod: data.paymentMethod,
+      };
+      // Call backend checkout API
+      const res = await (await import('../lib/api')).api.post<{
+        orderNumber: string;
+        paymentUrl?: string;
+        status?: string;
+      }>(
+        '/api/orders/checkout',
+        payload,
+        { auth: true }
+      );
       clearCart();
+      if (res.data?.paymentUrl) {
+        // Redirect to payment provider if provided
+        window.location.href = res.data.paymentUrl;
+        return;
+      }
       toast.success(t('checkout.orderSuccess'));
       navigate('/');
     } catch (error) {

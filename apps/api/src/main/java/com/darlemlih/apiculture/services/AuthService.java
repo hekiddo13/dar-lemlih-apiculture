@@ -4,6 +4,9 @@ import com.darlemlih.apiculture.dto.auth.*;
 import com.darlemlih.apiculture.entities.User;
 import com.darlemlih.apiculture.entities.enums.UserRole;
 import com.darlemlih.apiculture.repositories.UserRepository;
+import com.darlemlih.apiculture.exceptions.ConflictException;
+import com.darlemlih.apiculture.exceptions.NotFoundException;
+import com.darlemlih.apiculture.exceptions.UnauthorizedException;
 import com.darlemlih.apiculture.security.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,7 +31,7 @@ public class AuthService {
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new ConflictException("EMAIL_EXISTS", "Email already exists");
         }
 
         User user = User.builder()
@@ -53,12 +56,16 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+        } catch (Exception e) {
+            throw new UnauthorizedException("INVALID_CREDENTIALS", "Invalid email or password");
+        }
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    User user = userRepository.findByEmail(request.getEmail())
+        .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "User not found"));
 
         String accessToken = jwtUtils.generateAccessToken(user);
         String refreshToken = jwtUtils.generateRefreshToken(user);
@@ -70,8 +77,8 @@ public class AuthService {
     }
 
     public AuthResponse refresh(String refreshToken) {
-        User user = userRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+    User user = userRepository.findByRefreshToken(refreshToken)
+        .orElseThrow(() -> new UnauthorizedException("INVALID_REFRESH_TOKEN", "Invalid refresh token"));
 
         String newAccessToken = jwtUtils.generateAccessToken(user);
         String newRefreshToken = jwtUtils.generateRefreshToken(user);
@@ -84,8 +91,8 @@ public class AuthService {
 
     @Transactional
     public void forgotPassword(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "User not found"));
 
         String token = UUID.randomUUID().toString();
         user.setResetPasswordToken(token);
@@ -97,11 +104,11 @@ public class AuthService {
 
     @Transactional
     public void resetPassword(String token, String newPassword) {
-        User user = userRepository.findByResetPasswordToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid token"));
+    User user = userRepository.findByResetPasswordToken(token)
+        .orElseThrow(() -> new UnauthorizedException("INVALID_RESET_TOKEN", "Invalid token"));
 
         if (user.getResetPasswordTokenExpiry().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Token expired");
+            throw new UnauthorizedException("RESET_TOKEN_EXPIRED", "Token expired");
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));

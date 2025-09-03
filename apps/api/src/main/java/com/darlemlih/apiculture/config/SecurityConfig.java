@@ -1,6 +1,7 @@
 package com.darlemlih.apiculture.config;
 
 import com.darlemlih.apiculture.security.JwtAuthenticationFilter;
+import com.darlemlih.apiculture.config.properties.AppProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,22 +32,30 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
+    private final AppProperties appProperties;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/products/**").permitAll()
-                        .requestMatchers("/api/categories/**").permitAll()
-                        .requestMatchers("/api/payments/webhook").permitAll()
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/products/**").permitAll()
+            .requestMatchers("/api/categories/**").permitAll()
+            .requestMatchers("/api/payments/webhook").permitAll()
+            // Allow password reset for initial setup
+            .requestMatchers("/api/admin/reset-passwords").permitAll()
+            // Health and actuator endpoints
+            .requestMatchers("/actuator/health").permitAll()
+            .requestMatchers("/actuator/health/**").permitAll()
+            // Swagger / OpenAPI
+            .requestMatchers("/swagger-ui.html").permitAll()
+            .requestMatchers("/swagger-ui/**").permitAll()
+            .requestMatchers("/v3/api-docs/**").permitAll()
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            .anyRequest().authenticated()
+        )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -77,11 +86,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
+        if (appProperties.getCors().getAllowedOrigins() != null) {
+            configuration.setAllowedOrigins(appProperties.getCors().getAllowedOrigins());
+        }
+        if (appProperties.getCors().getAllowedMethods() != null) {
+            configuration.setAllowedMethods(Arrays.asList(appProperties.getCors().getAllowedMethods().split(",")));
+        }
+        configuration.setAllowedHeaders(appProperties.getCors().getAllowedHeaders() == null ? Arrays.asList("*") : Arrays.asList(appProperties.getCors().getAllowedHeaders().split(",")));
+        configuration.setAllowCredentials(Boolean.TRUE.equals(appProperties.getCors().getAllowCredentials()));
+        configuration.setMaxAge(appProperties.getCors().getMaxAge());
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
