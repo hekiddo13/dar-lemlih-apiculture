@@ -11,34 +11,38 @@ export default function DebugApp() {
   const testImports = async () => {
     try {
       addStatus('Testing React Router...');
-      const { Routes, Route } = await import('react-router-dom');
+      await import('react-router-dom');
       addStatus('✓ React Router loaded');
-    } catch (e: any) {
-      addStatus(`✗ React Router failed: ${e.message}`);
+    } catch (e: unknown) {
+      const error = e as Error;
+      addStatus(`✗ React Router failed: ${error.message}`);
     }
 
     try {
       addStatus('Testing i18n...');
       await import('./i18n');
       addStatus('✓ i18n loaded');
-    } catch (e: any) {
-      addStatus(`✗ i18n failed: ${e.message}`);
+    } catch (e: unknown) {
+      const error = e as Error;
+      addStatus(`✗ i18n failed: ${error.message}`);
     }
 
     try {
       addStatus('Testing HomePage...');
       await import('./pages/HomePage');
       addStatus('✓ HomePage loaded');
-    } catch (e: any) {
-      addStatus(`✗ HomePage failed: ${e.message}`);
+    } catch (e: unknown) {
+      const error = e as Error;
+      addStatus(`✗ HomePage failed: ${error.message}`);
     }
 
     try {
       addStatus('Testing auth store...');
       await import('./stores/authStore');
       addStatus('✓ Auth store loaded');
-    } catch (e: any) {
-      addStatus(`✗ Auth store failed: ${e.message}`);
+    } catch (e: unknown) {
+      const error = e as Error;
+      addStatus(`✗ Auth store failed: ${error.message}`);
     }
   };
 

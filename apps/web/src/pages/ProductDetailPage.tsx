@@ -1,32 +1,22 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, ChevronLeft, ChevronRight, Package, MapPin, Leaf } from 'lucide-react';
+import { ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { api } from '../lib/api';
 import { Product } from '../types';
 import { useCartStore } from '../stores/cartStore';
-import { useAuthStore } from '../stores/authStore';
-import { formatPrice, getLocalizedField } from '../lib/utils';
-import Button from '../components/ui/Button';
-import Loader from '../components/ui/Loader';
-import Error from '../components/ui/Error';
 
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const addItem = useCartStore(state => state.addItem);
-  const { isAuthenticated } = useAuthStore();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
 
-  useEffect(() => {
-    fetchProduct();
-  }, [slug]);
-
-  const fetchProduct = async () => {
+  const fetchProduct = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api<Product>(`/api/products/${slug}`, { auth: false });
@@ -37,7 +27,11 @@ export default function ProductDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [slug, navigate]);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [fetchProduct]);
 
   const handleAddToCart = () => {
     if (product) {

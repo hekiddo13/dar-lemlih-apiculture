@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import AppHeader from '../components/layout/AppHeader';
 import HomePage from '../pages/HomePage';
 import ProductListPage from '../pages/ProductListPage';
@@ -31,12 +31,16 @@ function ProtectedRoute({ children, requireAdmin = false }: { children: React.Re
 export default function App() {
   const { accessToken, fetchUser } = useAuthStore();
   
-  // Fetch user data on app load if token exists
-  useEffect(() => {
+  const memoizedFetchUser = useCallback(() => {
     if (accessToken) {
       fetchUser();
     }
-  }, [accessToken]);
+  }, [accessToken, fetchUser]);
+  
+  // Fetch user data on app load if token exists
+  useEffect(() => {
+    memoizedFetchUser();
+  }, [memoizedFetchUser]);
   
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

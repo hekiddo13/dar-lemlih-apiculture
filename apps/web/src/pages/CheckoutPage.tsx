@@ -31,7 +31,7 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const { items, clearCart, getTotalPrice } = useCartStore();
   const [loading, setLoading] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep] = useState(1);
 
   const {
     register,

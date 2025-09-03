@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, Edit, Trash2, Search, X } from 'lucide-react';
 import { api } from '../../lib/api';
@@ -28,11 +28,7 @@ export default function ProductsPage() {
     isFeatured: false,
   });
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get('/api/admin/products');
@@ -43,7 +39,11 @@ export default function ProductsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const handleDelete = async (id: string) => {
     if (!window.confirm(t('admin.confirmDelete'))) return;
